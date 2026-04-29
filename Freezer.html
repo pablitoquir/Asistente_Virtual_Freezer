@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freezer — Emperador del Universo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --void: #03010a; --deep: #0a0518; --mid: #130a2e; --surface: #1c1040;
+    --border: #3a1f7a; --purple: #7c3aed; --violet: #a855f7;
+    --ice: #e2d9f3; --dim: #7c6fa0; --gold: #d4af37;
+  }
+  html, body { height: 100%; background: var(--void); color: var(--ice); font-family: 'Crimson Pro', Georgia, serif; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.06) 0%, transparent 50%);
+  }
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite; opacity: 0; }
+  @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: var(--o); } }
+  .container { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 60px; max-width: 760px; margin: 0 auto; }
+  .crown { width: 100%; text-align: center; margin-bottom: 12px; }
+  .crown-line { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 4px; }
+  .crown-line::before, .crown-line::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); }
+  .crown-icon { color: var(--gold); font-size: 20px; letter-spacing: 8px; }
+  h1 { font-family: 'Cinzel', serif; font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 900; letter-spacing: 0.12em; background: linear-gradient(135deg, #d4af37 0%, #c084fc 40%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 6px; }
+  .subtitle { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.4em; color: var(--dim); text-transform: uppercase; }
+  .avatar-wrap { position: relative; margin: 32px 0 24px; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
+  .avatar-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--border); animation: rotate 20s linear infinite; }
+  .avatar-ring::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid transparent; border-top-color: var(--violet); border-bottom-color: var(--gold); animation: rotate 8s linear infinite reverse; }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  .avatar-img { width: 120px; height: 230px; border-radius: 50%; border: 2px solid var(--border); background: var(--mid); display: flex; align-items: center; justify-content: center; overflow: hidden; transition: filter 0.4s, box-shadow 0.4s; }
+  .avatar-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .avatar-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 48px; background: radial-gradient(circle, var(--surface), var(--deep)); color: var(--dim); gap: 6px; }
+  .avatar-placeholder span:last-child { font-size: 11px; font-family: monospace; }
+  .avatar-img.talking { filter: drop-shadow(0 0 24px var(--violet)) brightness(1.1); animation: pulse-talk 0.6s ease-in-out infinite alternate; }
+  @keyframes pulse-talk { from { box-shadow: 0 0 30px rgba(168,85,247,0.3); } to { box-shadow: 0 0 60px rgba(168,85,247,0.7); } }
+  .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); font-size: 0.8rem; letter-spacing: 0.12em; color: var(--dim); transition: all 0.3s; margin-bottom: 20px; min-width: 160px; justify-content: center; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); }
+  .status-badge.listening { color: #34d399; border-color: #34d399; }
+  .status-badge.listening .status-dot { background: #34d399; animation: blink 0.8s infinite; }
+  .status-badge.thinking { color: var(--gold); border-color: var(--gold); }
+  .status-badge.thinking .status-dot { background: var(--gold); animation: blink 0.5s infinite; }
+  .status-badge.speaking { color: var(--violet); border-color: var(--violet); }
+  .status-badge.speaking .status-dot { background: var(--violet); animation: blink 0.4s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+  .response-box { width: 100%; background: linear-gradient(135deg, var(--deep) 0%, var(--mid) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; min-height: 100px; font-size: 1.1rem; line-height: 1.75; color: var(--ice); font-style: italic; position: relative; margin-bottom: 8px; transition: border-color 0.3s; }
+  .response-box::before { content: '"'; position: absolute; top: -2px; left: 16px; font-size: 4rem; color: var(--border); font-family: 'Cinzel', serif; line-height: 1; }
+  .response-box.active { border-color: var(--violet); }
+  .response-text { padding-top: 8px; }
+  .transcript-box { width: 100%; font-size: 0.82rem; color: var(--dim); margin-bottom: 20px; min-height: 18px; text-align: right; font-style: italic; }
+  .input-area { width: 100%; display: flex; gap: 10px; align-items: stretch; }
+  .text-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; color: var(--ice); font-family: 'Crimson Pro', serif; font-size: 1rem; outline: none; transition: border-color 0.3s; }
+  .text-input:focus { border-color: var(--violet); }
+  .text-input::placeholder { color: var(--dim); font-style: italic; }
+  .btn { border: none; border-radius: 10px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.1em; padding: 14px 20px; transition: all 0.2s; white-space: nowrap; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-send { background: linear-gradient(135deg, var(--purple), var(--violet)); color: white; font-weight: 700; }
+  .btn-send:hover:not(:disabled) { background: linear-gradient(135deg, #6d28d9, #9333ea); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+  .btn-mic { background: var(--surface); border: 1px solid var(--border); color: var(--dim); font-size: 1.3rem; padding: 14px 16px; letter-spacing: 0; }
+  .btn-mic:hover:not(:disabled) { border-color: #34d399; color: #34d399; }
+  .btn-mic.active { border-color: #34d399; color: #34d399; background: rgba(52,211,153,0.12); animation: mic-pulse 1s infinite; }
+  @keyframes mic-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0.4); } 50% { box-shadow: 0 0 0 8px rgba(52,211,153,0); } }
+  .error-msg { color: #f87171; font-size: 0.85rem; margin-top: 10px; text-align: center; min-height: 20px; }
+  .footer { margin-top: 32px; font-size: 0.72rem; color: var(--border); letter-spacing: 0.15em; font-family: 'Cinzel', serif; text-align: center; }
+  .typing::after { content: '▋'; animation: blink 0.7s infinite; color: var(--violet); }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+
+  <div class="crown">
+    <div class="crown-line"><span class="crown-icon">◆ ◆ ◆</span></div>
+    <h1>Freezer</h1>
+    <div class="subtitle">Emperador del Universo</div>
+  </div>
+
+  <div class="avatar-wrap">
+    <div class="avatar-ring"></div>
+    <div class="avatar-img" id="avatarImg">
+      <img id="freezerImg" src="" alt="Freezer"
+        onerror="this.style.display='none'; document.getElementById('avatarFallback').style.display='flex'">
+      <div class="avatar-placeholder" id="avatarFallback" style="display:none">
+        <span>👾</span><span>agrega imagen</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-badge" id="statusBadge">
+    <span class="status-dot"></span>
+    <span id="statusText">EN ESPERA</span>
+  </div>
+
+  <div class="response-box" id="responseBox">
+    <div class="response-text" id="responseText">
+      ...Aceptable que hayas llegado hasta aquí, miserable. Habla.
+    </div>
+  </div>
+
+  <div class="transcript-box" id="transcriptBox"></div>
+
+  <div class="input-area">
+    <input type="text" class="text-input" id="textInput"
+      placeholder="Escríbele al Emperador del Universo..." autocomplete="off"/>
+    <button class="btn btn-mic" id="micBtn" title="Hablar por micrófono">🎙️</button>
+    <button class="btn btn-send" id="sendBtn">ENVIAR</button>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+</div>
+
+<script>
+
+
+
+//  API Key de Gemini
+const API_KEY = "Pegas la api de gemini o podes usar otra api de otra IA";
+
+
+
+// URL directa de la imagen de Freezer
+const IMAGEN_URL = "https://static.wikia.nocookie.net/dragonballmultiverse/images/b/b9/Freezer.png/revision/latest?cb=20130715063600&path-prefix=es";
+
+// Personalidad de Freezer
+const PERSONALIDAD = `Eres Freezer, el Emperador del Universo de Dragon Ball Z.
+- Hablás con elegancia fría, arrogancia imperial y desprecio calculado
+- Nunca perdés la compostura, incluso cuando te provocan
+- Usás frases como "fascinante", "qué tedioso", "inferior", "miserable", "insignificante"
+- Opinás sobre todo con superioridad intelectual
+- Nunca rompas el personaje
+- Responde conciso y breve lo que te piden no dejes a la persona sin una respuesta de lo que te pide 
+- Respondé SIEMPRE en español`;
+
+
+
+// Cargamos la imagen en el avatar
+const freezerImg = document.getElementById('freezerImg');
+const avatarFallback = document.getElementById('avatarFallback');
+if (IMAGEN_URL && !IMAGEN_URL.includes('PEGA_')) {
+  freezerImg.src = IMAGEN_URL;
+  freezerImg.style.display = 'block';
+  avatarFallback.style.display = 'none';
+}
+
+// Referencias a los elementos de la página
+const statusBadge   = document.getElementById('statusBadge');
+const statusText    = document.getElementById('statusText');
+const responseText  = document.getElementById('responseText');
+const responseBox   = document.getElementById('responseBox');
+const transcriptBox = document.getElementById('transcriptBox');
+const textInput     = document.getElementById('textInput');
+const sendBtn       = document.getElementById('sendBtn');
+const micBtn        = document.getElementById('micBtn');
+const errorMsg      = document.getElementById('errorMsg');
+const avatarImg     = document.getElementById('avatarImg');
+
+// Generamos las estrellas animadas del fondo
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 120; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--o:${0.3+Math.random()*0.7};animation-delay:${Math.random()*4}s;`;
+  starsEl.appendChild(s);
+}
+
+function setStatus(estado, texto) {
+  statusBadge.className = 'status-badge ' + estado;
+  statusText.textContent = texto;
+}
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+}
+
+// Llama a la API de Gemini y devuelve la respuesta como texto
+async function preguntarAFreezer(mensajeUsuario) {
+  if (!API_KEY || API_KEY.includes('TU_API')) {
+    showError('Primero pegá tu API Key de Gemini en el código (variable API_KEY)');
+    setStatus('', 'EN ESPERA');
+    return null;
+  }
+
+  const respuesta = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: PERSONALIDAD }] },
+        contents: [{ role: 'user', parts: [{ text: mensajeUsuario }] }],
+        generationConfig: { maxOutputTokens: 850 }
+      })
+    }
+  );
+
+  if (!respuesta.ok) {
+    const err = await respuesta.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Error ${respuesta.status}`);
+  }
+
+  const datos = await respuesta.json();
+  return datos.candidates[0].content.parts
+    .map(p => p.text)
+    .join('');
+}
+
+// ================================================================
+// Convierte texto en voz usando Fish Audio (voz real de Freezer)
+// ================================================================
+async function hablar(texto) {
+  return new Promise(async (resolve) => {
+    // Validaciones antes de llamar a la API
+    try {
+      avatarImg.classList.add('talking');
+      setStatus('speaking', 'HABLANDO');
+
+      const response = await fetch('http://localhost:3001/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: texto })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        throw new Error(`Fish Audio ${response.status}: ${errText || 'error desconocido'}`);
+      }
+
+      // Convertimos la respuesta binaria en un Blob de audio
+      const audioBlob = await response.blob();
+      if (audioBlob.size === 0) throw new Error('Fish Audio devolvio audio vacio');
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Guardamos en variable global para evitar que el GC lo elimine
+      window._freezerAudio = new Audio(audioUrl);
+      const audio = window._freezerAudio;
+
+      let resuelto = false;
+      const limpiarYResolver = () => {
+        if (resuelto) return;   // evitamos que se llame dos veces
+        resuelto = true;
+        clearTimeout(timeout);
+        avatarImg.classList.remove('talking');
+        // Pequeño delay antes de revocar para que el audio termine de usar el blob
+        setTimeout(() => URL.revokeObjectURL(audioUrl), 1000);
+        resolve();
+      };
+
+      // Timeout de seguridad basado en duracion del audio + 3s de margen
+      // Antes de que empiece usamos 15s como fallback
+      let timeout = setTimeout(limpiarYResolver, 15000);
+
+      // Cuando sabemos la duracion real, ajustamos el timeout
+      audio.onloadedmetadata = () => {
+        clearTimeout(timeout);
+        const duracionMs = (audio.duration * 1000) + 3000;
+        timeout = setTimeout(limpiarYResolver, duracionMs);
+      };
+
+      audio.onended   = limpiarYResolver;
+      audio.onerror   = limpiarYResolver;
+      audio.onstalled = limpiarYResolver;  // se trabo cargando
+
+      audio.play().catch(limpiarYResolver);
+
+    } catch (err) {
+      avatarImg.classList.remove('talking');
+      if (err.message.includes('fetch')) {
+        showError('No se puede conectar al proxy. ¿Corriste python proxy_fishaudio.py?');
+      } else {
+        showError('Error Fish Audio: ' + err.message);
+      }
+      resolve();
+    }
+  });
+}
+
+// Flujo completo: usuario escribe/habla → Gemini responde → Fish Audio habla
+async function procesarMensaje(textoUsuario) {
+  if (!textoUsuario.trim()) return;
+
+  showError('');
+  transcriptBox.textContent = `Vos dijiste: "${textoUsuario}"`;
+
+  sendBtn.disabled = true;
+  micBtn.disabled = true;
+  setStatus('thinking', 'PENSANDO...');
+  responseBox.classList.add('active');
+  responseText.textContent = '...';
+  responseText.classList.add('typing');
+
+  try {
+    const respuesta = await preguntarAFreezer(textoUsuario);
+    if (!respuesta) {
+      responseText.classList.remove('typing');
+      sendBtn.disabled = false;
+      micBtn.disabled = false;
+      setStatus('', 'EN ESPERA');
+      return;
+    }
+
+    responseText.classList.remove('typing');
+    responseText.textContent = respuesta;
+    await hablar(respuesta);
+
+    setStatus('', 'EN ESPERA');
+    responseBox.classList.remove('active');
+
+  } catch (err) {
+    responseText.classList.remove('typing');
+    showError('Error: ' + err.message);
+    setStatus('', 'EN ESPERA');
+    avatarImg.classList.remove('talking');
+  }
+
+  sendBtn.disabled = false;
+  micBtn.disabled = false;
+}
+
+// Click en ENVIAR
+sendBtn.addEventListener('click', () => {
+  const val = textInput.value.trim();
+  textInput.value = '';
+  procesarMensaje(val);
+});
+
+// Presionar Enter también envía el mensaje
+textInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const val = textInput.value.trim();
+    textInput.value = '';
+    procesarMensaje(val);
+  }
+});
+
+// Reconocimiento de voz por micrófono
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let reconociendo = false;
+let recognition = null;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-AR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    reconociendo = true;
+    micBtn.classList.add('active');
+    micBtn.textContent = '🔴';
+    setStatus('listening', 'ESCUCHANDO...');
+  };
+
+  recognition.onresult = (e) => {
+    const transcripcion = e.results[0][0].transcript;
+    procesarMensaje(transcripcion);
+  };
+
+  recognition.onerror = (e) => {
+    reconociendo = false;
+    micBtn.classList.remove('active');
+    micBtn.textContent = '🎙️';
+    if (e.error !== 'aborted') {
+      showError('Error de micrófono: ' + e.error);
+      setStatus('', 'EN ESPERA');
+    }
+  };
+
+  recognition.onend = () => {
+    reconociendo = false;
+    micBtn.classList.remove('active');
+    micBtn.textContent = '🎙️';
+  };
+
+  micBtn.addEventListener('click', () => {
+    if (reconociendo) recognition.stop();
+    else { showError(''); recognition.start(); }
+  });
+
+} else {
+  micBtn.disabled = true;
+  micBtn.title = 'Tu navegador no soporta micrófono. Usá Chrome o Edge.';
+  micBtn.style.opacity = '0.3';
+}
+
+</script>
+</body>
+</html>
